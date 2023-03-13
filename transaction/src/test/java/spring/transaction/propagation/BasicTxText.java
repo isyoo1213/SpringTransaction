@@ -77,4 +77,49 @@ class BasicTxText {
 
         log.info("트랜잭션 롤백 완료");
     }
+
+    /**
+     * *** 히카리 커넥션 풀로의 con 요청 및 반환
+     *      실제 물리 con0을 HikariProxyConnection 이라는 Proxy로 감싼 객체를 반환
+     *      -> 획득/반환되어 재사용되는 실제 물리 con0이 아닌, con을 감싸고 있는 Proxy의 인스턴스 정보
+     *      -> con0의 반납이 완료되면 이를 감싼 Proxy 인스턴스는 파괴되고, 새로운 요청에 새롭게 생성되어 con0을 재사용
+     */
+    @Test
+    void double_commit() {
+        log.info("트랜잭션1 시작");
+        TransactionStatus tx1 = txManager.getTransaction(new DefaultTransactionDefinition());
+        //로그 - Con 정보
+        //HikariProxyConnection@54162225 wrapping conn0
+        log.info("트랜잭션1 커밋");
+        txManager.commit(tx1);
+
+        log.info("트랜잭션2 시작");
+        TransactionStatus tx2 = txManager.getTransaction(new DefaultTransactionDefinition());
+        //로그 - Con 정보
+        //HikariProxyConnection@1799598337 wrapping conn0
+        log.info("트랜잭션2 커밋");
+        txManager.commit(tx2);
+    }
+
+    /**
+     * 각각의 트랜잭션이 커넥션 풀에서 획득한 다른 con을 사용하는 상황
+     * 트랜잭션 1은 commit / 트랜젹션 2는 rollback
+     * 즉, 여기까지는 트랜잭션이 꼬이지 않고 서로 다른 con을 활용한 서로 다른 트랜잭션이 이루어지는 단순한 상황
+     */
+    @Test
+    void double_commit_rollback() {
+        log.info("트랜잭션1 시작");
+        TransactionStatus tx1 = txManager.getTransaction(new DefaultTransactionDefinition());
+        //로그 - Con 정보
+        //HikariProxyConnection@54162225 wrapping conn0
+        log.info("트랜잭션1 커밋");
+        txManager.commit(tx1);
+
+        log.info("트랜잭션2 시작");
+        TransactionStatus tx2 = txManager.getTransaction(new DefaultTransactionDefinition());
+        //로그 - Con 정보
+        //HikariProxyConnection@1799598337 wrapping conn0
+        log.info("트랜잭션2 롤백");
+        txManager.rollback(tx2);
+    }
 }
