@@ -42,7 +42,8 @@ class BasicTxText {
         //o.s.j.d.DataSourceTransactionManager
         // : Acquired Connection [HikariProxyConnection@348228202 wrapping conn0
         // : url=jdbc:h2:mem:2c60cd4a-bdae-492f-88f4-f30900e3eb9f user=SA] for JDBC transaction
-        //로그 - Switching JDBC Connection to manual commit
+        //로그 - 수동 커밋 모드로 전환
+        // Switching JDBC Connection to manual commit
 
         log.info("트랜잭션 커밋 시작");
         txManager.commit(status);
