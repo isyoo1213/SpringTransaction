@@ -3,6 +3,7 @@ package spring.transaction.propagation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service에서 메서드 단위에 @Transaction을 적용하는 것이 아닌, Repository의 메서드 단위에 @Transactional이 적용된 상황
@@ -18,8 +19,10 @@ public class MemberService {
     private final LogRepository logRepository;
 
     /**
-     * 각각의 repository의 내부 메서드에 @Transactionl 적용 중
+     * 1. 각각의 repository의 내부 메서드에 @Transactionl 적용
+     * 2. repository들을 호출하는 메서드에 @Transactional 적용
      */
+    @Transactional
     public void joinV1(String username) {
         Member member = new Member(username);
         Log logMessage = new Log(username); //편의상 log 메시지는 username으로

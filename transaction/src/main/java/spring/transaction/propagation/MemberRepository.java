@@ -20,7 +20,7 @@ public class MemberRepository {
 
     private final EntityManager em;
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    //@Transactional(propagation = Propagation.REQUIRED)
     public void save(Member member) {
         log.info("member 저장");
         em.persist(member);

@@ -62,4 +62,22 @@ class MemberServiceTest {
         assertTrue(logRepository.find(username).isEmpty()); //Log의 message는 username과 동일하게 맞추기로
     }
 
+    /**
+     * memberService     @Transactional:ON
+     * memberRepository  @Transactional:OFF
+     * logRepository     @Transactional:OFF
+     */
+    @Test
+    void singleTx() {
+        //given
+        String username = "outerTxOff_success";
+
+        //when
+        memberService.joinV1(username);
+
+        //then
+        assertTrue(memberRepository.find(username).isPresent());
+        assertTrue(logRepository.find(username).isPresent());
+    }
+
 }
