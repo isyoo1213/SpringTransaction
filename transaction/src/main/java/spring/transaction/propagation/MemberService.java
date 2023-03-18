@@ -41,6 +41,7 @@ public class MemberService {
      *  -> logRepository에 try-catch를 적용해 method 단위에서 정상 흐름을 반환하도록 복구
      * 각각의 repository의 내부 메서드에 @Transactionl 적용 중
      */
+    @Transactional
     public void joinV2(String username) {
         Member member = new Member(username);
         Log logMessage = new Log(username); //편의상 log 메시지는 username으로
