@@ -156,4 +156,32 @@ class MemberServiceTest {
         assertTrue(logRepository.find(username).isEmpty());
     }
 
+    /**
+     * memberService     @Transactional:ON
+     * memberRepository  @Transactional:ON
+     * logRepository     @Transactional:ON(REQUIRES_NEW) + Exception(RuntimeException / try-catch X)
+     * 즉, Service 계층에서 물리 outerTx를 생성하고 Repository 계층에서 각각의 논리 innerTx 를 생성하는 경우
+     * -> '신규 트랜잭션 여부' 확인이 중요 -> 새로운 신규 트랜잭션 생성
+     * -> 기존의 물리 outerTx 가 아닌 기존의 논리 Tx가 물리 innerTx 생성하면서 독자적인 Tx 로 분리
+     * -> 논리/물리 innerTx Rollback 시, 참여하고 있는 물리 outerTx에 marking 여부 - marking하지 않음
+     */
+    @Test
+    void recoverException_success() {
+        //given
+        String username = "로그예외_recoverException_success";
+
+        //when
+        memberService.joinV2(username);
+
+        //then : member 저장 + log 롤백
+        assertTrue(memberRepository.find(username).isPresent());
+        assertTrue(logRepository.find(username).isEmpty());
+    }
+    /**
+     * 주의점
+     * 결국 하나의 요청에 con0(보류, pool로 반납하거나 접속 종료가 아님), con1 각각의 커넥션을 유지하며 2개를 사용하는 구조
+     * -> 커넥션을 동시에 사용하는 구조를 피할 수 있는 것도 효율적인 구조
+     * -> ex) Facade를 전면에 두고, 각각의 Tx를 '동시'가 아닌 '순차'적으로 처리하도록 구성
+     */
+
 }
